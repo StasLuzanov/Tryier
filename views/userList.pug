@@ -1,0 +1,25 @@
+﻿extends layout
+
+block content
+    div
+        table
+            thead
+                div.top Users List
+                tr: th UserName
+                    th ApiKey
+                    th Full Name
+                    th Email
+                    th Age
+            tbody
+                each user in users
+                    tr
+                        td
+                            div= user.userName
+                        td
+                            div= user.apiKey
+                        td
+                            div= user.fullName
+                        td
+                            div= user.email
+                        td
+                            div= user.age

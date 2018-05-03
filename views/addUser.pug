@@ -1,0 +1,20 @@
+﻿extends layout
+
+block content
+    div.top User Creation Wizard
+        form(method="POST", action="/users/create")
+            div.form-group
+                input.form-control(type="text",placeholder="Full Name", name="name")
+                span.focus-border
+            div.form-group
+                input.form-control(type="text", placeholder="User Name", name="userName")
+                span.focus-border
+            div.form-group
+                input.form-control(type="email", placeholder="your.email@mail.com", name="email")
+                span.focus-border
+            div.form-group
+                input.form-control(type="text", placeholder="Age", name="age")
+                span.focus-border
+            div
+                div.form
+                    button.btn.btn-primary(type="submit") Create

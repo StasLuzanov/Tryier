@@ -1,0 +1,11 @@
+﻿extends layout
+
+block content
+    div.top Please, provide us with your api key
+        form(method="POST", action="/users/login")
+            div.form-group-b
+                input.form-control(type="password",placeholder="Your ApiKey", name="apiKey")
+                span.focus-border
+            div
+                div.form
+                    button.btn.btn-primary(type="submit") Login

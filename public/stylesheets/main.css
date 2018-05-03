@@ -1,0 +1,97 @@
+﻿body {
+    padding: 50px;
+}
+
+.form-control {
+    border: 0;
+    padding: 7px 0;
+    border-bottom: 1px solid #ccc;
+}
+
+.form-control ~ .focus-border {
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background-color: #78788c;
+    transition: 0.4s;
+}
+
+.form-control:focus ~ .focus-border {
+    width: 100%;
+    transition: 0.4s;
+    left: 0;
+}
+
+input {
+    font: 15px/24px 'Muli', sans-serif;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1px;
+}
+
+:focus {
+    outline: none;
+}
+
+.form {
+    float: left;
+    width: 95%;
+    margin: 0 3%;
+    position: relative;
+}
+
+.form-group {
+    float: left;
+    width: 34%;
+    margin: 30px 8%;
+    position: relative;
+}
+
+.form-group-b {
+    float: left;
+    width: 90%;
+    margin: 30px 6%;
+    position: relative;
+}
+
+button {
+    padding: 8px 12px;
+    margin: 8px 35% 35%;
+    font: 15px/24px 'Muli', sans-serif;
+    border: 2px solid #78788c;
+    background: 0;
+    color: #5a5a6e;
+    cursor: pointer;
+    transition: all .3s;
+    width: 30%;
+}
+
+.b {
+    padding: 8px 12px;
+    margin: 8px;
+    font: 15px/24px 'Muli', sans-serif;
+    border: 2px solid #78788c;
+    background: 0;
+    color: #5a5a6e;
+    cursor: pointer;
+    transition: all .3s;
+    width: 10%;
+}
+
+button:hover {
+    background: #78788c;
+    color: #fff
+}
+
+.top {
+    width: 95%;
+    font: 27px/30px 'Muli', sans-serif;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 3px;
+    text-align: center;
+}

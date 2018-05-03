@@ -1,0 +1,17 @@
+/RUNNING_PID
+/logs/
+/project/project/
+**/node_modules/
+**/target/
+**/logs/
+
+*.#*
+*.jar
+.git
+.idea
+*.iml
+*.pyc
+*.js.map
+*.js
+*.vs
+/**/*.js
