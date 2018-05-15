@@ -5,6 +5,7 @@ import * as Promise from 'bluebird';
 
 import index from './routes/index';
 import user from './routes/user';
+
 import { UserStorage } from './lib/storage';
 import { User } from './lib/user';
 
@@ -44,11 +45,11 @@ function init() {
     return Promise.try(() => {
         return new UserStorage().checkIfExists('systemAdmin')
             .then(result => {
-                return (result) 
-                    ? console.log(`user ${userToAdd.userName} already exists`) 
+                return (result)
+                    ? console.log(`user ${userToAdd.userName} already exists`)
                     : new UserStorage().addUser(userToAdd)
                         .then(result => console.log(`user ${result}`))
-        })
+            })
     })
-        .catch(err => err);
+        .catch(err => { throw err });
 };

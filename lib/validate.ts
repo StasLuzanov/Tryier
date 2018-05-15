@@ -24,4 +24,16 @@ export class Validate {
         return this.validate<boolean>(validator.isBoolean, 'boolean', data, object, required, dflt);
     };
 
+    public static date(data: any, object: string, required: boolean = false, dflt: Date = new Date()): Date {
+        return this.validate<Date>(validator.isDate, 'date', data, object, required, dflt);
+    };
+
+    public static object<T>(data: any, object: string, create: (data: any) => T, required: boolean = false, dflt: T = null) {
+        if (validator.isEmpty(data)) {
+            if (required) throw new Error(`Missing value for ${data[object]}`);
+            return dflt;
+        }
+        return create(data)
+    }
+
 };

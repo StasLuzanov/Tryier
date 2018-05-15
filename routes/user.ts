@@ -1,10 +1,19 @@
 import ex = require('express');
 import * as Promise from 'bluebird';
-import { Storage, UserStorage } from '../lib/storage';
+import { Storage, UserStorage, SessionStorage } from '../lib/storage';
+import { Session } from '../lib/session';
 const router = ex.Router();
+let sesInfo;
 
 const auth = function (req: ex.Request, res: ex.Response, next: ex.NextFunction) {
-    return (req.session.user != null) ? next() : res.render('login', { error_msg: "Not authenticated" });
+    return (req.session.user != null)
+        ? new SessionStorage().getSessionTimeout(req.session.sessionHash)
+            .then(result => (result === 'Good')
+                ? new SessionStorage().updateSessionAction(req.session.sessionHash)
+                    .then(() => next())
+                : res.render('login', { error_msg: result }))
+            .catch(err => res.render('login', { error_msg: err }))
+        : res.render('login', { error_msg: "Not authenticated" });
 };
 
 // LANDING
@@ -29,6 +38,15 @@ router.post('/login', (req: ex.Request, res: ex.Response) => {
                     ? req.session.admin = true
                     : req.session.admin = false
             })
+            .then(() => {
+                let session = {
+                    userName: req.session.user
+                };
+                sesInfo = new Session(session);
+                console.log(JSON.stringify(sesInfo));
+                return new SessionStorage().insertSession(sesInfo)
+            })
+            .then(result => req.session.sessionHash = sesInfo.sessionHash)
             .then(() => res.render('actions', { userName: req.session.displayName }))
             .catch(err => res.render('login', { error_msg: err }))
         : res.render('login', { error_msg: "Please, provide username and password" });
@@ -72,20 +90,5 @@ router.post('/remove', auth, (req: ex.Request, res: ex.Response) => {
         .then(result => res.render('actions', { userName: req.session.displayName, success_msg: result }))
         .catch(err => res.render('delete', { error_msg: err }))
 });
-
-function pages(path: string) {
-    var page: string = '';
-    switch (path) {
-        case '/user/add': {
-            page = 'actions';
-            break;
-        }
-        default: {
-            page = 'login';
-            break;
-        }
-    }
-    return page;
-};
 
 export default router;

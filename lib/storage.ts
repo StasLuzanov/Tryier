@@ -1,6 +1,7 @@
 import * as Promise from 'bluebird';
 import { MongoClient, Db } from 'mongodb';
 import { User } from './user';
+import { Session } from './session';
 const uri = 'mongodb://localhost:27017/what';
 const cn = getConnection();
 
@@ -17,6 +18,10 @@ export interface IStorage {
     updateMany(collection: string, searchQuery: any, updateQuery: any): Promise<any>;
     deleteOne(collection: string, filter: any): Promise<any>;
     deleteMany(collection: string, filter: any): Promise<any>;
+};
+
+export interface ISessionStorage {
+    insertSession(session: Session): Promise<any>;
 };
 
 export interface IUserStorage {
@@ -54,7 +59,7 @@ export class Storage implements IStorage {
 
     public updateOne(collection: string, searchQuery: any, updateQuery: any) {
         return cn
-            .then(db => db.collection(collection).updateOne(searchQuery, updateQuery));
+            .then(db => db.collection(collection).updateOne(searchQuery, updateQuery, { upsert: true }));
     };
 
     public updateMany(collection: string, searchQuery: any, updateQuery: any) {
@@ -148,6 +153,47 @@ export class UserStorage extends Storage implements IUserStorage {
             .then(result => {
                 return (result) ? true : false
             })
+            .catch(err => Promise.reject(err));
+    };
+
+};
+
+// SESSION STORAGE
+export class SessionStorage extends Storage implements ISessionStorage {
+
+    private static readonly COLLECTION: string = 'session';
+
+    constructor() {
+        super();
+    }
+
+    public insertSession(session: Session) {
+        return super.insertOne(SessionStorage.COLLECTION, session)
+            .then(result => Promise.resolve(`Initiated session for user ${session.userName}`))
+            .catch(err => Promise.reject(err));
+    };
+
+    public getSessionTimeout(sessionHash: string) {
+        let query = { sessionHash: sessionHash };
+        return super.findOne(SessionStorage.COLLECTION, query)
+            .then(session => {
+                return ((Math.ceil(
+                    (new Date().getTime()
+                        - session.lastAction.getTime()
+                    )
+                    / (1000 * 60)))
+                    > 1)
+                    ? Promise.reject(`Session is expired`)
+                    : Promise.resolve(`Good`)
+            })
+            .catch(err => Promise.reject(err));
+    };
+
+    public updateSessionAction(sessionHash: string) {
+        let searchQuery = { sessionHash: sessionHash };
+        let updateQuery = { $set: {lastAction: new Date() }};
+        return super.updateOne(SessionStorage.COLLECTION, searchQuery, updateQuery)
+            .then(result => console.log(`Session Action Updated`))
             .catch(err => Promise.reject(err));
     };
 
