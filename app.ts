@@ -1,73 +1,54 @@
-﻿import debug = require('debug');
-import express = require('express');
+import ex = require('express');
+import session = require('express-session');
 import path = require('path');
+import * as Promise from 'bluebird';
 
-import { UserStore } from './src/db';
-import { User } from './src/user';
-import routes from './routes/index';
-import users from './routes/user';
-const userStore = new UserStore();
-var app = express();
+import index from './routes/index';
+import user from './routes/user';
+import { UserStorage } from './lib/storage';
+import { User } from './lib/user';
+
+const app = ex();
 
 init();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
+app.use(session({
+    secret: 'why-the-fuck',
+    resave: true,
+    saveUninitialized: true
+}));
+
+//view engine setup
+app.set('views', __dirname + '/views');
 app.set('view engine', 'pug');
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(ex.static(path.join(__dirname, 'public')));
+app.use(ex.urlencoded({ extended: false }));
+app.use(ex.json());
 
-app.use('/', routes);
-app.use('/users', users);
+app.use('/', index);
+app.use('/user', user);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-    var err = new Error('Not Found');
-    err['status'] = 404;
-    next(err);
-});
-
-// error handlers
-
-// development error handler
-// will print stacktrace
-if (app.get('env') === 'development') {
-    app.use((err: any, req, res, next) => {
-        res.status(err['status'] || 500);
-        res.render('error', {
-            message: err.message,
-            error: err
-        });
-    });
-}
-
-// production error handler
-// no stacktraces leaked to user
-app.use((err: any, req, res, next) => {
-    res.status(err.status || 500);
-    res.render('error', {
-        message: err.message,
-        error: {}
-    });
-});
-
-app.set('port', process.env.PORT || 50003);
-
-var server = app.listen(app.get('port'), function () {
-    debug('Express server listening on port ' + server.address().port);
-});
+app.listen(50003);
+console.log("app running at http://localhost:50003");
 
 function init() {
-    return userStore.checkIfExists('admin')
-        .then(result => {
-            if (result) {
-                return
-            } else {
-                const admin = { userName: 'admin', apiKey: 'admin!' };
-                return userStore.insertOne('users', new User(admin))
-            }
+    var superUser = {
+        userName: 'systemAdmin',
+        fullName: 'Super User',
+        password: 'System@dmin',
+        email: 'luzanau@gmail.com',
+        isAdmin: true
+    };
+    const userToAdd: User = new User(superUser);
+    return Promise.try(() => {
+        return new UserStorage().checkIfExists('systemAdmin')
+            .then(result => {
+                return (result) 
+                    ? console.log(`user ${userToAdd.userName} already exists`) 
+                    : new UserStorage().addUser(userToAdd)
+                        .then(result => console.log(`user ${result}`))
         })
-        .catch(err => { throw err });
+    })
+        .catch(err => err);
 };

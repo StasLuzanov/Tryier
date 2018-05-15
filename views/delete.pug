@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    div.top Delete a user
+    form(method="POST", action="/user/remove")
+        div.f-g-b
+            input.f-c(type="name", placeholder="User Name", name="userName")
+            span.f-b
+        div.top
+            div.f
+                button.b.b-p(type="submit") Delete
+    form(method="GET", action="/user/action")
+        div.top
+            div.f
+                button.b.b-p(type="submit") Back

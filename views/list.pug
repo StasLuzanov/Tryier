@@ -1,0 +1,31 @@
+extends layout
+
+block content
+    div
+        table.table.table-striped
+            thead.thead-light
+                div.top Users List
+                tr: th User Name
+                    th Email
+                    th Full Name
+                    th Admin
+            tbody
+                each user in users
+                    tr
+                        td
+                            div= user.userName
+                        td
+                            div= user.email
+                        td
+                            div= user.fullName
+                        td
+                            div= user.isAdmin
+    br
+    form(method="GET", action="/user/add")
+        div.top
+            div.f
+            button.b(type='submit') Add User
+    form(method="GET", action="/user/action")
+        div.top
+            div.f
+            button.b.b-p(type="submit") Back

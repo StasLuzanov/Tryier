@@ -1,20 +1,32 @@
-﻿extends layout
+extends layout
 
 block content
     div.top User Creation Wizard
-        form(method="POST", action="/users/create")
-            div.form-group
-                input.form-control(type="text",placeholder="Full Name", name="name")
-                span.focus-border
-            div.form-group
-                input.form-control(type="text", placeholder="User Name", name="userName")
-                span.focus-border
-            div.form-group
-                input.form-control(type="email", placeholder="your.email@mail.com", name="email")
-                span.focus-border
-            div.form-group
-                input.form-control(type="text", placeholder="Age", name="age")
-                span.focus-border
-            div
-                div.form
-                    button.btn.btn-primary(type="submit") Create
+    form(method="POST", action="/user/add")
+        div.f-g
+            input.f-c(type="text",placeholder="Full Name", name="fullName")
+            span.f-b
+        div.f-g
+            input.f-c(type="text", placeholder="User Name", name="userName")
+            span.f-b
+        div.f-g
+            input.f-c(type="email", placeholder="your.email@mail.com", name="email")
+            span.f-b
+        div.f-g
+            input.f-c(type="password", placeholder="Password", name="password")
+            span.f-b
+        div.f-g
+            select.f-c(name="isAdmin")
+                option.f-c(value="true") Admin
+                option.f-c(value="false") Regular User
+            span.f-b
+        div.f-g-hidden
+            input.f-c-hidden(type="password")
+            span.f-b-hidden
+        div.top
+            div.f
+                button.b.b-p(type="submit") Create
+    form(method="GET", action="/user/action")
+        div.top
+            div.f
+                button.b.b-p(type="submit") Back

@@ -1,75 +1,91 @@
-﻿import express = require('express');
-const router = express.Router();
-import { UserStore } from '../src/db';
+import ex = require('express');
 import * as Promise from 'bluebird';
-import * as util from 'util';
-import { User } from '../src/user';
-const storeUser = new UserStore();
+import { Storage, UserStorage } from '../lib/storage';
+const router = ex.Router();
 
-router.get('/login', (req: express.Request, res: express.Response) => {
+const auth = function (req: ex.Request, res: ex.Response, next: ex.NextFunction) {
+    return (req.session.user != null) ? next() : res.render('login', { error_msg: "Not authenticated" });
+};
+
+// LANDING
+router.get('/action', auth, (req: ex.Request, res: ex.Response) => {
+    res.render('actions', { userName: req.session.displayName });
+});
+
+// LOGIN BLOCK
+router.get('/login', (req: ex.Request, res: ex.Response) => {
     res.render('login');
 });
 
-router.post('/login', (req: express.Request, res: express.Response) => {
-    const apiKey = req.body.apiKey;
-    console.log(apiKey);
-    return storeUser.validateApiKey(apiKey)
-        .then(result => storeUser.getUserByApiKey(apiKey))
-        .then(result => res.status(200).render('main', { userName: result.userName }))
-        .catch(err => res.status(400).render('error', ({ error: { message: err, status: 400 } })))
+router.post('/login', (req: ex.Request, res: ex.Response) => {
+    const userName = req.body.username;
+    const password = req.body.password;
+    return (userName && password)
+        ? new UserStorage().getUserByFullMatch(userName, password)
+            .then(result => {
+                req.session.user = result.userName;
+                req.session.displayName = result.fullName;
+                return (result.isAdmin)
+                    ? req.session.admin = true
+                    : req.session.admin = false
+            })
+            .then(() => res.render('actions', { userName: req.session.displayName }))
+            .catch(err => res.render('login', { error_msg: err }))
+        : res.render('login', { error_msg: "Please, provide username and password" });
 });
 
-// router.post('/create', (req: express.Request, res: express.Response) => {
-// 	const user = new User(req.body);
-//     return storeUser.createUser(user)
-//         .then(result => res.status(200).render('main'))
-//         .catch(err => res.status(409).send({ error: err }));
-// });
+// ADD USER BLOCK
+router.get('/add', auth, (req: ex.Request, res: ex.Response) => {
+    res.render('addUser');
+});
 
-// router.get('/login', (req: express.Request, res: express.Response) => {
-// 	res.render('login');
-// });
+router.post('/add', auth, (req: ex.Request, res: ex.Response) => {
+    if (req.body.isAdmin === "true") {
+        req.body.isAdmin = true;
+    } else {
+        req.body.isAdmin = false;
+    }
+    return Promise.try(() => {
+        return new UserStorage().addUser(req.body)
+            .then(result => res.render('actions', { userName: req.session.displayName, success_msg: result }))
+    })
+        .catch(err => res.render('addUser', { error_msg: err }));
+});
 
-// router.post('/login', (req: express.Request, res: express.Response) => {
-// 	const apiKey = req.body.apiKey;
-// 	return storeUser.validateApiKey(apiKey)
-// 		.then(result => storeUser.getUserByApiKey(apiKey))
-// 		.then(user => res.render('main', { userName: user.userName }))
-// 		.catch(err => res.status(400).send({ error: err }));
-// });
+// VIEW USERS BLOCK
+router.get('/list', auth, (req: ex.Request, res: ex.Response) => {
+    return new UserStorage().getUsers()
+        .then(result => res.render('list', {
+            users: result.sort(function (a, b) { return (a.userName > b.userName) ? 1 : ((b.userName > a.userName) ? -1 : 0) })
+        }))
+        .catch(err => res.render('list', { error_msg: err }));
+});
 
-// router.get('/:username', (req: express.Request, res: express.Response) => {
-//     const user = req.params['username'];
-//     const apiKey = req.query['apiKey'];
-//     return storeUser.validateApiKey(apiKey)
-//         .then(() => storeUser.getUserByName(user))
-//         .then(result => res.status(200).send(result))
-//         .catch(err => res.status(400).send({ error: err }));
-// });
+// REMOVE USER BLOCK
+router.get('/remove', auth, (req: ex.Request, res: ex.Response) => {
+    res.render('delete');
+});
 
-// router.get('/', (req: express.Request, res: express.Response) => {
-//     const apiKey = req.query['apiKey'];
-//     return storeUser.validateApiKey(apiKey)
-//         .then(() => storeUser.getAllUsers())
-//         .then(result => res.status(200).send(result))
-//         .catch(err => res.status(400).send({ error: err }));
-// });
+router.post('/remove', auth, (req: ex.Request, res: ex.Response) => {
+    const userName = req.body.userName;
+    return new UserStorage().deleteUser(userName)
+        .then(result => res.render('actions', { userName: req.session.displayName, success_msg: result }))
+        .catch(err => res.render('delete', { error_msg: err }))
+});
 
-// router.delete('/:username', (req: express.Request, res: express.Response) => {
-//     const user = req.params['username'];
-//     const apiKey = req.query['apiKey'];
-//     return storeUser.validateApiKey(apiKey)
-//         .then(() => storeUser.deleteUser(user))
-//         .then(result => res.status(200).send({ message: result }))
-//         .catch(err => res.status(400).send({ error: err }));
-// });
-
-// router.post('/list', (req: express.Request, res: express.Response) => {
-// 	const userName = req.body.username;
-// 	return storeUser.getUserByName(userName)
-// 		.then(result => storeUser.getAllUsers())
-// 		.then(result => res.render('userList', { users: result }))
-// 		.catch(err => res.status(400).send({ error: err }));
-// });
+function pages(path: string) {
+    var page: string = '';
+    switch (path) {
+        case '/user/add': {
+            page = 'actions';
+            break;
+        }
+        default: {
+            page = 'login';
+            break;
+        }
+    }
+    return page;
+};
 
 export default router;

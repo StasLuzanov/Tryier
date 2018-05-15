@@ -1,14 +1,21 @@
-﻿body {
+body {
     padding: 50px;
 }
 
-.form-control {
+.f-c {
     border: 0;
     padding: 7px 0;
     border-bottom: 1px solid #ccc;
 }
 
-.form-control ~ .focus-border {
+.f-c-hidden {
+    border: 0;
+    padding: 7px 0;
+    border-bottom: 1px solid #ccc;
+    visibility: hidden;
+}
+
+.f-c ~ .f-b {
     position: absolute;
     bottom: 0;
     left: 50%;
@@ -18,7 +25,11 @@
     transition: 0.4s;
 }
 
-.form-control:focus ~ .focus-border {
+select {
+    width: 100%;
+}
+
+.f-c:focus ~ .f-b {
     width: 100%;
     transition: 0.4s;
     left: 0;
@@ -32,25 +43,42 @@ input {
     letter-spacing: 1px;
 }
 
+select {
+    font: 15px/24px 'Muli', sans-serif;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1px;
+}
+
+option {
+    font: 15px/24px 'Muli', sans-serif;
+    color: #333;
+    width: 100%;
+    box-sizing: border-box;
+    letter-spacing: 1px;
+}
+
 :focus {
     outline: none;
 }
 
-.form {
-    float: left;
-    width: 95%;
-    margin: 0 3%;
-    position: relative;
-}
-
-.form-group {
+.f-g {
     float: left;
     width: 34%;
     margin: 30px 8%;
     position: relative;
 }
 
-.form-group-b {
+.f-g-hidden {
+    float: left;
+    visibility: hidden;
+    width: 34%;
+    margin: 30px 8%;
+    position: relative;
+}
+
+.f-g-b {
     float: left;
     width: 90%;
     margin: 30px 6%;
@@ -67,6 +95,7 @@ button {
     cursor: pointer;
     transition: all .3s;
     width: 30%;
+    letter-spacing: 1px;
 }
 
 .b {
@@ -78,7 +107,7 @@ button {
     color: #5a5a6e;
     cursor: pointer;
     transition: all .3s;
-    width: 10%;
+    width: 47%;
 }
 
 button:hover {
@@ -87,7 +116,6 @@ button:hover {
 }
 
 .top {
-    width: 95%;
     font: 27px/30px 'Muli', sans-serif;
     color: #333;
     width: 100%;
@@ -95,3 +123,17 @@ button:hover {
     letter-spacing: 3px;
     text-align: center;
 }
+
+/* td {
+    width: 33%;
+    font: 15px/24px 'Muli', sans-serif;
+}
+
+th {
+    width: 33%;
+    font: 23px/27px 'Muli', sans-serif;
+}
+
+tr:nth-child(2n) {
+    background-color: #d0d0db;
+} */

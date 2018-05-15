@@ -1,11 +1,14 @@
-﻿extends layout
+extends layout
 
 block content
-    div.top Please, provide us with your api key
-        form(method="POST", action="/users/login")
-            div.form-group-b
-                input.form-control(type="password",placeholder="Your ApiKey", name="apiKey")
-                span.focus-border
-            div
-                div.form
-                    button.btn.btn-primary(type="submit") Login
+    div.top Sign In
+    form(method="POST", action="/user/login")
+        div.f-g
+            input.f-c(type="text", placeholder="Your Name", name="username")
+            span.f-b
+        div.f-g
+            input.f-c(type="password", placeholder="Your Password", name="password")
+            span.f-b
+        div.top
+            div.f
+                button.b.b-p(type="submit") Login
