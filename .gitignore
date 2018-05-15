@@ -15,7 +15,9 @@ node_modules/
 *.iml
 *.pyc
 *.js.map
-
+**/**.js.map
+/lib/*.js.map
+/routes/*.js.map
 /bin/set-env-override.sh
 
 /docker/*/includes/
@@ -30,7 +32,8 @@ src/controller/rest/**/*.js
 /src/dbmigrate/**/*.js
 /src/dbstats/**/*.js
 /src/dispatcher/**/*.js
-/src/lib/**/*.js
+/lib/**/*.js
+lib/**/*.js
 /src/test/**/*.js
 /src/voice/**/*.js
 !/src/Gruntfile.js
