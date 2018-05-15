@@ -18,7 +18,9 @@ node_modules/
 **/**.js.map
 /lib/*.js.map
 /routes/*.js.map
+/routes/*.js
 /bin/set-env-override.sh
+*.js
 
 /docker/*/includes/
 /docker/*/Dockerfile.bak
