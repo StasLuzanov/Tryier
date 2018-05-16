@@ -3,6 +3,10 @@ body {
     background-image: url('../img/bg2.jpg');
 }
 
+.wrapper {
+    bottom: 0px;
+}
+
 .f-c {
     border: 0;
     padding: 7px 0;

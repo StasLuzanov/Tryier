@@ -9,15 +9,17 @@ html
     script
         include ../routes/index.js
   body
-    div.wrapper  
-      if success_msg
-        .alert.alert-success #{success_msg}      
-      if error_msg
-        .alert.alert-danger #{error_msg}
-      if error
-        .alert.alert-danger #{error}
 
     block content
-    
+
+    div.f-c
+      div.wrapper
+        if success_msg
+          .alert.alert-success #{success_msg}      
+        if error_msg
+          .alert.alert-danger #{error_msg}
+        if error
+          .alert.alert-danger #{error}
+
   script.
     window.setTimeout(function() {$(".alert").fadeTo(500, 0).slideUp(500, function(){$(this).remove();});}, 2000);
