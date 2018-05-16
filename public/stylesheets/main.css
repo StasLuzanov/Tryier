@@ -39,6 +39,7 @@ select {
 input {
     font: 15px/24px 'Muli', sans-serif;
     color: #333;
+    background: transparent;
     width: 100%;
     box-sizing: border-box;
     letter-spacing: 1px;
@@ -47,17 +48,21 @@ input {
 select {
     font: 15px/24px 'Muli', sans-serif;
     color: #333;
+    background-color: transparent;
     width: 100%;
     box-sizing: border-box;
-    letter-spacing: 1px;
+    letter-spacing: 2px;
 }
 
-option {
+select option {
     font: 15px/24px 'Muli', sans-serif;
     color: #333;
-    width: 100%;
-    box-sizing: border-box;
-    letter-spacing: 1px;
+    background-color: transparent;
+    letter-spacing: 11px;
+}
+
+.styled-select select:focus {
+    outline: none;
 }
 
 :focus {
@@ -124,17 +129,3 @@ button:hover {
     letter-spacing: 3px;
     text-align: center;
 }
-
-/* td {
-    width: 33%;
-    font: 15px/24px 'Muli', sans-serif;
-}
-
-th {
-    width: 33%;
-    font: 23px/27px 'Muli', sans-serif;
-}
-
-tr:nth-child(2n) {
-    background-color: #d0d0db;
-} */

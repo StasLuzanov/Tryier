@@ -2,6 +2,7 @@ extends layout
 
 block content
     div.top Hello, #{userName}, what would you like to do?
+        
         form(method="GET", action="/user/add")
             button.b(type='submit') Add User
 
