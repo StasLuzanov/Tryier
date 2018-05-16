@@ -2,6 +2,7 @@ import * as Promise from 'bluebird';
 import { MongoClient, Db } from 'mongodb';
 import { User } from './user';
 import { Session } from './session';
+import ex = require('express');
 const uri = 'mongodb://localhost:27017/what';
 const cn = getConnection();
 
@@ -22,6 +23,9 @@ export interface IStorage {
 
 export interface ISessionStorage {
     insertSession(session: Session): Promise<any>;
+    getSessionTimeout(sessionHash: string): Promise<string>;
+    updateSessionAction(sessionHash: string, curPage: string): Promise<any>;
+    destroySession(req: ex.Request): Promise<any>;
 };
 
 export interface IUserStorage {
@@ -182,18 +186,32 @@ export class SessionStorage extends Storage implements ISessionStorage {
                         - session.lastAction.getTime()
                     )
                     / (1000 * 60)))
-                    > 1)
+                    > 27)
                     ? Promise.reject(`Session is expired`)
                     : Promise.resolve(`Good`)
             })
             .catch(err => Promise.reject(err));
     };
 
-    public updateSessionAction(sessionHash: string) {
+    public updateSessionAction(sessionHash: string, curPage: string) {
         let searchQuery = { sessionHash: sessionHash };
-        let updateQuery = { $set: {lastAction: new Date() }};
+        let updateQuery = { $set: { lastAction: new Date(), curPage: curPage } };
         return super.updateOne(SessionStorage.COLLECTION, searchQuery, updateQuery)
-            .then(result => console.log(`Session Action Updated`))
+            .then(result => console.log(`Session Action Was Updated`))
+            .catch(err => Promise.reject(err));
+    };
+
+    public destroySession(req: ex.Request) {
+        return this.removeSession(req.session.sessionHash)
+            .then(result => req.session = null)
+            .then(() => Promise.resolve('Session destroyed'))
+            .catch(err => Promise.reject(err))
+    };
+
+    public removeSession(sessionHash: string) {
+        let searchQuery = { sessionHash: sessionHash };
+        return super.deleteOne(SessionStorage.COLLECTION, searchQuery)
+            .then(result => Promise.resolve('Removed session record from database'))
             .catch(err => Promise.reject(err));
     };
 

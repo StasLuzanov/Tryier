@@ -1,5 +1,6 @@
 import ex = require('express');
 import * as Promise from 'bluebird';
+import parseurl = require('parseurl');
 import { Storage, UserStorage, SessionStorage } from '../lib/storage';
 import { Session } from '../lib/session';
 const router = ex.Router();
@@ -9,10 +10,14 @@ const auth = function (req: ex.Request, res: ex.Response, next: ex.NextFunction)
     return (req.session.user != null)
         ? new SessionStorage().getSessionTimeout(req.session.sessionHash)
             .then(result => (result === 'Good')
-                ? new SessionStorage().updateSessionAction(req.session.sessionHash)
+                ? new SessionStorage().updateSessionAction(req.session.sessionHash, parseurl(req).pathname)
                     .then(() => next())
-                : res.render('login', { error_msg: result }))
-            .catch(err => res.render('login', { error_msg: err }))
+                : new SessionStorage().destroySession(req)
+                    .then(() => res.render('login', { error_msg: result })))
+            .catch(err => {
+                new SessionStorage().destroySession(req)
+                    .then(() => res.render('login', { error_msg: err }))
+            })
         : res.render('login', { error_msg: "Not authenticated" });
 };
 
