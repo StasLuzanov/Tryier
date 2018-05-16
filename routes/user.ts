@@ -6,23 +6,23 @@ import { Session } from '../lib/session';
 const router = ex.Router();
 let sesInfo;
 
-const auth = function (req: ex.Request, res: ex.Response, next: ex.NextFunction) {
-    return (req.session.user != null)
-        ? new SessionStorage().getSessionTimeout(req.session.sessionHash)
-            .then(result => (result === 'Good')
-                ? new SessionStorage().updateSessionAction(req.session.sessionHash, parseurl(req).pathname)
-                    .then(() => next())
-                : new SessionStorage().destroySession(req)
-                    .then(() => res.render('login', { error_msg: result })))
-            .catch(err => {
-                new SessionStorage().destroySession(req)
-                    .then(() => res.render('login', { error_msg: err }))
-            })
-        : res.render('login', { error_msg: "Not authenticated" });
-};
+// const auth = function (req: ex.Request, res: ex.Response, next: ex.NextFunction) {
+//     return (req.session.user != null)
+//         ? new SessionStorage().getSessionTimeout(req.session.sessionHash)
+//             .then(result => (result === 'Good')
+//                 ? new SessionStorage().updateSessionAction(req.session.sessionHash, parseurl(req).pathname)
+//                     .then(() => next())
+//                 : new SessionStorage().destroySession(req)
+//                     .then(() => res.render('login', { error_msg: result })))
+//             .catch(err => {
+//                 new SessionStorage().destroySession(req)
+//                     .then(() => res.render('login', { error_msg: err }))
+//             })
+//         : res.render('login', { error_msg: "Not authenticated" });
+// };
 
 // LANDING
-router.get('/action', auth, (req: ex.Request, res: ex.Response) => {
+router.get('/action', (req: ex.Request, res: ex.Response) => {
     res.render('actions', { userName: req.session.displayName });
 });
 
@@ -48,7 +48,6 @@ router.post('/login', (req: ex.Request, res: ex.Response) => {
                     userName: req.session.user
                 };
                 sesInfo = new Session(session);
-                console.log(JSON.stringify(sesInfo));
                 return new SessionStorage().insertSession(sesInfo)
             })
             .then(result => req.session.sessionHash = sesInfo.sessionHash)
@@ -58,11 +57,11 @@ router.post('/login', (req: ex.Request, res: ex.Response) => {
 });
 
 // ADD USER BLOCK
-router.get('/add', auth, (req: ex.Request, res: ex.Response) => {
+router.get('/add', (req: ex.Request, res: ex.Response) => {
     res.render('addUser');
 });
 
-router.post('/add', auth, (req: ex.Request, res: ex.Response) => {
+router.post('/add', (req: ex.Request, res: ex.Response) => {
     if (req.body.isAdmin === "true") {
         req.body.isAdmin = true;
     } else {
@@ -76,7 +75,7 @@ router.post('/add', auth, (req: ex.Request, res: ex.Response) => {
 });
 
 // VIEW USERS BLOCK
-router.get('/list', auth, (req: ex.Request, res: ex.Response) => {
+router.get('/list', (req: ex.Request, res: ex.Response) => {
     return new UserStorage().getUsers()
         .then(result => res.render('list', {
             users: result.sort(function (a, b) { return (a.userName > b.userName) ? 1 : ((b.userName > a.userName) ? -1 : 0) })
@@ -85,11 +84,11 @@ router.get('/list', auth, (req: ex.Request, res: ex.Response) => {
 });
 
 // REMOVE USER BLOCK
-router.get('/remove', auth, (req: ex.Request, res: ex.Response) => {
+router.get('/remove', (req: ex.Request, res: ex.Response) => {
     res.render('delete');
 });
 
-router.post('/remove', auth, (req: ex.Request, res: ex.Response) => {
+router.post('/remove', (req: ex.Request, res: ex.Response) => {
     const userName = req.body.userName;
     return new UserStorage().deleteUser(userName)
         .then(result => res.render('actions', { userName: req.session.displayName, success_msg: result }))

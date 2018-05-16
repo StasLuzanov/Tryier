@@ -1,12 +1,14 @@
 import ex = require('express');
 import session = require('express-session');
 import path = require('path');
+import parseurl = require('parseurl');
 import * as Promise from 'bluebird';
 
 import index from './routes/index';
 import user from './routes/user';
+import notes from './routes/notes';
 
-import { UserStorage } from './lib/storage';
+import { UserStorage, SessionStorage } from './lib/storage';
 import { User } from './lib/user';
 
 const app = ex();
@@ -27,8 +29,10 @@ app.use(ex.static(path.join(__dirname, 'public')));
 app.use(ex.urlencoded({ extended: false }));
 app.use(ex.json());
 
+app.use(authChecker)
 app.use('/', index);
 app.use('/user', user);
+app.use('/notes', notes);
 
 app.listen(50003);
 console.log("app running at http://localhost:50003");
@@ -52,4 +56,24 @@ function init() {
             })
     })
         .catch(err => { throw err });
+
+};
+
+function authChecker(req: ex.Request, res: ex.Response, next: ex.NextFunction) {
+    if (req.path === "/user/login") {
+        next();
+    } else {
+        return (req.session.user != null)
+            ? new SessionStorage().getSessionTimeout(req.session.sessionHash)
+                .then(result => (result === 'Good')
+                    ? new SessionStorage().updateSessionAction(req.session.sessionHash, parseurl(req).pathname)
+                        .then(() => next())
+                    : new SessionStorage().destroySession(req)
+                        .then(() => res.render('login', { error_msg: result })))
+                .catch(err => {
+                    new SessionStorage().destroySession(req)
+                        .then(() => res.render('login', { error_msg: err }))
+                })
+            : res.render('login', { error_msg: `Not Authorized` });
+    };
 };
