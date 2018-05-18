@@ -1,0 +1,15 @@
+extends layout
+
+block content
+    div.top Delete a user
+    form(method="POST", action="/notes/delete")
+        div.f-g-b
+            input.f-c(type="name", placeholder="Note Title", name="noteName")
+            span.f-b
+        div.top
+            div.f
+                button.b.b-p(type="submit") Delete
+    form(method="GET", action="/notes")
+        div.top
+            div.f
+                button.b.b-p(type="submit") Back

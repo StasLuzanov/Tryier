@@ -2,6 +2,7 @@ import * as Promise from 'bluebird';
 import { MongoClient, Db } from 'mongodb';
 import { User } from './user';
 import { Session } from './session';
+import { Note } from './note';
 import ex = require('express');
 const uri = 'mongodb://localhost:27017/what';
 const cn = getConnection();
@@ -38,6 +39,13 @@ export interface IUserStorage {
     checkIfExists(userName: string): Promise<boolean>;
 };
 
+export interface INoteStorage {
+    addNote(note: Note, userName: string): Promise<any>;
+    getNote(noteName: string, userName: string): Promise<Note>;
+    getAllNotesForUser(userName: string): Promise<Note[]>;
+    deleteNote(noteName: string, userName: string): Promise<any>;
+}
+
 export class Storage implements IStorage {
     constructor() { }
 
@@ -50,6 +58,11 @@ export class Storage implements IStorage {
         return cn
             .then(db => db.collection(collection).find({}).toArray());
     };
+
+    public findMany(collection: string, query: any) {
+        return cn
+            .then(db => db.collection(collection).find(query).toArray());
+    }
 
     public insertOne(collection: string, doc: any) {
         return cn
@@ -213,6 +226,51 @@ export class SessionStorage extends Storage implements ISessionStorage {
         return super.deleteOne(SessionStorage.COLLECTION, searchQuery)
             .then(result => Promise.resolve('Removed session record from database'))
             .catch(err => Promise.reject(err));
+    };
+
+};
+
+export class NoteStorage extends Storage implements INoteStorage {
+
+    private static readonly COLLECTION: string = 'notes';
+
+    public addNote(note: Note, userName: string) {
+        return super.insertOne(NoteStorage.COLLECTION, note)
+            .then(result => Promise.resolve(`Successfully added note ${note.noteName} for user ${userName} in database`))
+            .catch(err => Promise.reject(err));
+    };
+
+    public getNote(noteName: string, userName: string) {
+        let query = { 'userName': userName, 'noteName': noteName };
+        return super.findOne(NoteStorage.COLLECTION, query)
+            .then(result => Promise.resolve(new Note(result)))
+            .catch(err => Promise.reject(err));
+    };
+
+    public getAllNotesForUser(userName: string) {
+        let query = { 'userName': userName };
+        return super.findMany(NoteStorage.COLLECTION, query)
+            .then(result => Promise.resolve(result))
+            .catch(err => Promise.reject(err));
+    };
+
+    public deleteNote(noteName: string, userName: string) {
+        let query = { 'noteName': noteName, 'userName': userName };
+        return this.noteExists(noteName, userName)
+            .then(result => super.deleteOne(NoteStorage.COLLECTION, result))
+            .then(result => Promise.resolve(`Successfully deleted note: ${noteName} from database`))
+            .catch(err => Promise.reject(err));
+    };
+
+    private noteExists(noteName: string, userName: string) {
+        let query = { 'noteName': noteName, 'userName': userName };
+        return super.findOne(NoteStorage.COLLECTION, query)
+            .then(result => 
+            (result)
+                ? Promise.resolve(query)
+                : Promise.reject(`No note with name: ${noteName} exists for user: ${userName}`)
+            )
+            .catch(err => Promise.reject(err))
     };
 
 };

@@ -1,4 +1,19 @@
 extends layout
 
 block content
-    
+    form(method="GET", action="/notes/add")
+        div.top
+            div.f
+            button.b(type='submit') Add Note
+    form(method="GET" action="/notes/view")
+        div.top
+            div.f
+            button.b(type='submit') View All Notes
+    form(method="GET" action="/notes/delete")
+        div.top
+            div.f
+            button.b(type='submit') Delete A Note
+    form(method="GET", action="/user/action")
+        div.top
+            div.f
+            button.b.b-p(type="submit") Back

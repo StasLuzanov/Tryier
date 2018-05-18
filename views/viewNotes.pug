@@ -1,0 +1,34 @@
+extends layout
+
+block content
+    div
+        table.table.table-striped
+            thead.thead-light
+                div.top Notes List
+                tr: th Note Title
+                    th Note
+                    th Created Date
+                    th Last Updated Date
+                    th Created By
+            tbody
+                each note in notes
+                    tr
+                        td
+                            div= note.noteName
+                        td
+                            div= note.note
+                        td
+                            div= note.createdDate
+                        td
+                            div= note.updatedDate
+                        td
+                            div= note.userName
+    br
+    form(method="GET", action="/notes/add")
+        div.top
+            div.f
+            button.b(type='submit') Add Note
+    form(method="GET", action="/notes")
+        div.top
+            div.f
+            button.b.b-p(type="submit") Back
