@@ -7,6 +7,7 @@ import * as Promise from 'bluebird';
 import index from './routes/index';
 import user from './routes/user';
 import notes from './routes/notes';
+import system from './routes/system';
 
 import { UserStorage, SessionStorage } from './lib/storage';
 import { User } from './lib/user';
@@ -33,6 +34,7 @@ app.use(authChecker)
 app.use('/', index);
 app.use('/user', user);
 app.use('/notes', notes);
+app.use('/system', system);
 
 app.listen(50003);
 console.log("app running at http://localhost:50003");

@@ -1,17 +1,16 @@
 extends layout
 
 block content
+    div.top Add a note
     form(method="POST", action="/notes/add")
+        div.f-g-b
+            input.f-c(type="text",placeholder="Note Title", name="noteName")
+            span.f-b
+        div.f-g-b
+            textarea.f-c(type="text", placeholder="Note", name="note")
+            span.f-b
         div.top
-            div.f
-                div.f-g
-                    input.f-c(type="text",placeholder="Note Title", name="noteName")
-                    span.f-b
-                div.f-g
-                    input.f-c(type="text", placeholder="Note", name="note")
-                    span.f-b
             button.b(type='submit') Add Note
     form(method="GET", action="/notes")
         div.top
-            div.f
             button.b.b-p(type="submit") Back

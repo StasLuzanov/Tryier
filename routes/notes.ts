@@ -15,7 +15,7 @@ router.get('/add', (req: ex.Request, res: ex.Response) => {
 
 router.get('/delete', (req: ex.Request, res: ex.Response) => {
     res.render('deleteNote');
-})
+});
 
 router.get('/view', (req: ex.Request, res: ex.Response) => {
     return new NoteStorage().getAllNotesForUser(req.session.user)

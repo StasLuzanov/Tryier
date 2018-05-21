@@ -23,9 +23,10 @@ block content
     br
     form(method="GET", action="/user/add")
         div.top
-            div.f
             button.b(type='submit') Add User
+    form(method="GET", action="/user/remove")
+        div.top
+            button.b Delete User
     form(method="GET", action="/user/action")
         div.top
-            div.f
             button.b.b-p(type="submit") Back

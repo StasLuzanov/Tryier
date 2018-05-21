@@ -6,21 +6,6 @@ import { Session } from '../lib/session';
 const router = ex.Router();
 let sesInfo;
 
-// const auth = function (req: ex.Request, res: ex.Response, next: ex.NextFunction) {
-//     return (req.session.user != null)
-//         ? new SessionStorage().getSessionTimeout(req.session.sessionHash)
-//             .then(result => (result === 'Good')
-//                 ? new SessionStorage().updateSessionAction(req.session.sessionHash, parseurl(req).pathname)
-//                     .then(() => next())
-//                 : new SessionStorage().destroySession(req)
-//                     .then(() => res.render('login', { error_msg: result })))
-//             .catch(err => {
-//                 new SessionStorage().destroySession(req)
-//                     .then(() => res.render('login', { error_msg: err }))
-//             })
-//         : res.render('login', { error_msg: "Not authenticated" });
-// };
-
 // LANDING
 router.get('/action', (req: ex.Request, res: ex.Response) => {
     res.render('actions', { userName: req.session.displayName });
